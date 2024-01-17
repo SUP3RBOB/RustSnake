@@ -9,6 +9,7 @@ pub struct Player {
     xDir: i32,
     yDir: i32,
     speed: f32,
+    tails: Vec<(f32, f32)>,
 }
 
 impl Player {
@@ -21,7 +22,7 @@ impl Player {
             xDir: 1,
             yDir: 0,
             speed: spd,
-
+            tails: Vec::new(),
         }
     }
 
@@ -33,6 +34,10 @@ impl Player {
     pub fn Move(&mut self) {
         self.x += (self.xDir as f32) * self.speed;
         self.y += (self.yDir as f32) * self.speed;
+    }
+
+    pub fn Position(&self) -> (f32, f32) {
+        return (self.x, self.y);
     }
 
     pub fn Draw(&self) {

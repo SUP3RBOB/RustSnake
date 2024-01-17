@@ -3,6 +3,7 @@ mod apple;
 
 use macroquad::prelude::*;
 use player::Player;
+use apple::Apple;
 
 fn WindowConfig() -> Conf {
     let mut c = Conf {
@@ -22,6 +23,7 @@ async fn main() {
 
     let mut player = Player::new(0.0, 0.0, 32.0, 32.0, 32.0);
     let mut apple = Apple::new(128.0, 128.0, 32.0, 32.0);
+    apple.JumpToRandomPosition();
 
     let mut gameSpeed = 0.2;
     let mut lastUpdate = get_time();
@@ -30,8 +32,8 @@ async fn main() {
 
     while (!exited) {
         if (get_time() - lastUpdate >= gameSpeed) {
-            Update(&mut player, &mut exited);
-            Draw(&player);
+            Update(&mut player, &mut apple, &mut exited);
+            Draw(&player, &apple);
             lastUpdate = get_time();
             next_frame().await;
         }
@@ -44,7 +46,7 @@ fn Start() {
 
 }
 
-fn Update(player: &mut Player, exit: &mut bool) {
+fn Update(player: &mut Player, apple: &mut Apple, exit: &mut bool) {
     if (is_key_pressed(KeyCode::Escape)) {
         (*exit) = true;
     }
@@ -66,6 +68,10 @@ fn Update(player: &mut Player, exit: &mut bool) {
     }
 
     player.Move();
+
+    if (player.Position() == apple.Position()) {
+        apple.JumpToRandomPosition();
+    }
 }
 
 fn Draw(player: &Player, apple: &Apple) {
