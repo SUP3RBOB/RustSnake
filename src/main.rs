@@ -1,13 +1,28 @@
 mod player;
+mod apple;
 
 use macroquad::prelude::*;
 use player::Player;
 
-#[macroquad::main("RustSnake")]
+fn WindowConfig() -> Conf {
+    let mut c = Conf {
+        window_title: "RustSnake".to_owned(),
+        fullscreen: false,
+        ..Default::default()
+    };
+
+    c.window_width = 512;
+    c.window_height = 512;
+    return c;
+}
+
+#[macroquad::main(WindowConfig)]
 async fn main() {
     let mut exited = false;
 
     let mut player = Player::new(0.0, 0.0, 32.0, 32.0, 32.0);
+    let mut apple = Apple::new(128.0, 128.0, 32.0, 32.0);
+
     let mut gameSpeed = 0.2;
     let mut lastUpdate = get_time();
 
@@ -53,10 +68,10 @@ fn Update(player: &mut Player, exit: &mut bool) {
     player.Move();
 }
 
-fn Draw(player: &Player) {
+fn Draw(player: &Player, apple: &Apple) {
     clear_background(BLACK);
     player.Draw();
-    draw_text("Hello World", 4.0, 4.0, 20f32, WHITE);
+    apple.Draw();
 }
 
 fn End() {
