@@ -30,9 +30,9 @@ impl Player {
         self.yDir = y;
     }
 
-    pub fn Move(&mut self, delta: f32) {
-        self.x += (self.xDir as f32) * self.speed * delta;
-        self.y += (self.yDir as f32) * self.speed * delta;
+    pub fn Move(&mut self) {
+        self.x += (self.xDir as f32) * self.speed;
+        self.y += (self.yDir as f32) * self.speed;
     }
 
     pub fn Draw(&self) {

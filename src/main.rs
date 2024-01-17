@@ -5,17 +5,21 @@ use player::Player;
 
 #[macroquad::main("RustSnake")]
 async fn main() {
-    let exited = false;
+    let mut exited = false;
 
-    let mut player = Player::new(0.0, 0.0, 32.0, 32.0, 1.0);
-    let mut timer = 0f32;
+    let mut player = Player::new(0.0, 0.0, 32.0, 32.0, 32.0);
+    let mut gameSpeed = 0.2;
+    let mut lastUpdate = get_time();
 
     Start();
 
     while (!exited) {
-
-        Update(&mut player);
-        Draw(&player).await;
+        if (get_time() - lastUpdate >= gameSpeed) {
+            Update(&mut player, &mut exited);
+            Draw(&player);
+            lastUpdate = get_time();
+            next_frame().await;
+        }
     }
 
     End();
@@ -25,7 +29,11 @@ fn Start() {
 
 }
 
-fn Update(player: &mut Player) {
+fn Update(player: &mut Player, exit: &mut bool) {
+    if (is_key_pressed(KeyCode::Escape)) {
+        (*exit) = true;
+    }
+
     if (is_key_pressed(KeyCode::Right)) {
         player.SetDirection(1, 0);
     }
@@ -42,14 +50,13 @@ fn Update(player: &mut Player) {
         player.SetDirection(0, 1);
     }
 
-    player.Move(1f32);
+    player.Move();
 }
 
-async fn Draw(player: &Player) {
+fn Draw(player: &Player) {
     clear_background(BLACK);
     player.Draw();
     draw_text("Hello World", 4.0, 4.0, 20f32, WHITE);
-    next_frame().await;
 }
 
 fn End() {
