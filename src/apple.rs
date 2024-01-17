@@ -1,4 +1,4 @@
-use macroquad::{prelude::*, rand::{self, srand}};
+use macroquad::{prelude::*, rand::{self, srand, RandomRange}};
 
 pub struct Apple {
     x: f32,
@@ -8,35 +8,33 @@ pub struct Apple {
 }
 
 impl Apple {
-    pub fn new(xPos: f32, yPos: f32, width: f32, height: f32) -> Apple{
+    pub fn new(x_pos: f32, y_pos: f32, width: f32, height: f32) -> Apple {
         return Apple {
-            x: xPos,
-            y: yPos,
+            x: x_pos,
+            y: y_pos,
             w: width,
             h: height,
         };
     }
 
-    pub fn Position(&self) -> (f32, f32) {
+    pub fn position(&self) -> (f32, f32) {
         return (self.x, self.y);
     }
 
-    pub fn JumpToRandomPosition(&mut self) {
+    pub fn jump_to_random_position(&mut self) {
         let xb = screen_width() as i32 / 32;
         let yb = screen_height() as i32 / 32;
 
 
         srand(get_time() as u64);
-        let newX = rand::RandomRange::gen_range(0, xb) * 32;
-        let newY = rand::RandomRange::gen_range(0, yb) * 32;
+        let new_x = RandomRange::gen_range(0, xb) * 32;
+        let new_y = RandomRange::gen_range(0, yb) * 32;
 
-        self.x = newX as f32;
-        self.y = newY as f32;
+        self.x = new_x as f32;
+        self.y = new_y as f32;
     }
 
-    pub fn Draw(&self) {
+    pub fn draw(&self) {
         draw_rectangle(self.x, self.y, self.w, self.h, GREEN);
-
-        
     }
 }

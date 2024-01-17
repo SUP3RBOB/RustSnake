@@ -5,81 +5,75 @@ use macroquad::prelude::*;
 use player::Player;
 use apple::Apple;
 
-fn WindowConfig() -> Conf {
-    let mut c = Conf {
+fn window_config() -> Conf {
+    return Conf {
         window_title: "RustSnake".to_owned(),
         fullscreen: false,
+        window_width: 512,
+        window_height: 512,
         ..Default::default()
     };
-
-    c.window_width = 512;
-    c.window_height = 512;
-    return c;
 }
 
-#[macroquad::main(WindowConfig)]
+#[macroquad::main(window_config)]
 async fn main() {
     let mut exited = false;
 
-    let mut player = Player::new(0.0, 0.0, 32.0, 32.0, 32.0);
+    let mut player = Player::new(64.0, 64.0, 32.0, 32.0, 32.0);
     let mut apple = Apple::new(128.0, 128.0, 32.0, 32.0);
-    apple.JumpToRandomPosition();
+    apple.jump_to_random_position();
 
-    let mut gameSpeed = 0.2;
+    let gameSpeed = 0.15;
     let mut lastUpdate = get_time();
-
-    Start();
 
     while (!exited) {
         if (get_time() - lastUpdate >= gameSpeed) {
-            Update(&mut player, &mut apple, &mut exited);
-            Draw(&player, &apple);
+            update(&mut player, &mut apple, &mut exited);
+            draw(&player, &apple);
             lastUpdate = get_time();
             next_frame().await;
         }
     }
-
-    End();
 }
 
-fn Start() {
-
-}
-
-fn Update(player: &mut Player, apple: &mut Apple, exit: &mut bool) {
+fn update(player: &mut Player, apple: &mut Apple, exit: &mut bool) {
     if (is_key_pressed(KeyCode::Escape)) {
         (*exit) = true;
     }
 
     if (is_key_pressed(KeyCode::Right)) {
-        player.SetDirection(1, 0);
+        player.set_direction(1, 0);
     }
 
     if (is_key_pressed(KeyCode::Up)) {
-        player.SetDirection(0, -1);
+        player.set_direction(0, -1);
     }
 
     if (is_key_pressed(KeyCode::Left)) {
-        player.SetDirection(-1, 0);
+        player.set_direction(-1, 0);
     }
 
     if (is_key_pressed(KeyCode::Down)) {
-        player.SetDirection(0, 1);
+        player.set_direction(0, 1);
     }
 
-    player.Move();
+    player.move_player();
 
-    if (player.Position() == apple.Position()) {
-        apple.JumpToRandomPosition();
+    if (player.position() == apple.position()) {
+        player.add_to_tail();
+        apple.jump_to_random_position();
+    }
+
+    if (player.is_out_of_bounds() || player.is_touching_tail()) {
+        player.clear_tails();
+        player.set_position(64.0, 64.0);
+        player.set_direction(1, 0);
+        apple.jump_to_random_position();
     }
 }
 
-fn Draw(player: &Player, apple: &Apple) {
+fn draw(player: &Player, apple: &Apple) {
     clear_background(BLACK);
-    player.Draw();
-    apple.Draw();
-}
-
-fn End() {
-
+    player.draw();
+    apple.draw();
 }
