@@ -11,6 +11,7 @@ pub struct Player {
     y_dir: i32,
     speed: f32,
     tails: Vec<(f32, f32)>,
+    highscore: i32,
 }
 
 impl Player {
@@ -24,7 +25,12 @@ impl Player {
             y_dir: 0,
             speed: spd,
             tails: Vec::new(),
+            highscore: 0,
         }
+    }
+
+    pub fn get_direction(&self) -> (i32, i32) {
+        return (self.x_dir, self.y_dir);
     }
 
     pub fn set_direction(&mut self, x: i32, y: i32) {
@@ -44,7 +50,7 @@ impl Player {
 
         let tail_count = self.tails.len();
 
-        let mut i= tail_count - 1;
+        let mut i = tail_count - 1;
         while (i > 0) {
             self.tails[i] = self.tails[i - 1];
             i -= 1;
@@ -81,6 +87,7 @@ impl Player {
     pub fn draw(&self) {
         draw_rectangle(self.x, self.y, self.width, self.height, RED);
         draw_text(format!("Score: {}", self.tails.len()).as_str(), 15.0, 20.0, 20.0, WHITE);
+        draw_text(format!("Highscore: {}", self.highscore).as_str(), 16.0, 40.0, 20.0, WHITE);
 
         if (self.tails.len() <= 0) {
             return;
@@ -110,6 +117,18 @@ impl Player {
     }
 
     pub fn clear_tails(&mut self) {
-        self.tails = Vec::new();
+        self.tails.clear();
+    }
+
+    pub fn get_highscore(&self) -> i32 {
+        return self.highscore;
+    }
+
+    pub fn set_highscore(&mut self, score: i32) {
+        self.highscore = score;
+    }
+
+    pub fn get_tail_count(&self) -> i32 {
+        return self.tails.len() as i32;
     }
 }

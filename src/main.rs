@@ -11,6 +11,7 @@ fn window_config() -> Conf {
         fullscreen: false,
         window_width: 512,
         window_height: 512,
+        window_resizable: false,
         ..Default::default()
     };
 }
@@ -23,40 +24,52 @@ async fn main() {
     let mut apple = Apple::new(128.0, 128.0, 32.0, 32.0);
     apple.jump_to_random_position();
 
-    let gameSpeed = 0.15;
-    let mut lastUpdate = get_time();
+    let game_speed = 0.15;
+    let mut last_update = get_time();
 
     while (!exited) {
-        if (get_time() - lastUpdate >= gameSpeed) {
-            update(&mut player, &mut apple, &mut exited);
+        get_inputs(&mut player, &mut exited);
+
+        if (get_time() - last_update >= game_speed) {
+            update(&mut player, &mut apple);
             draw(&player, &apple);
-            lastUpdate = get_time();
+            last_update = get_time();
             next_frame().await;
         }
     }
 }
 
-fn update(player: &mut Player, apple: &mut Apple, exit: &mut bool) {
+fn get_inputs(player: &mut Player, exit: &mut bool) {
     if (is_key_pressed(KeyCode::Escape)) {
         (*exit) = true;
     }
 
     if (is_key_pressed(KeyCode::Right)) {
-        player.set_direction(1, 0);
+        if (player.get_direction() != (-1, 0)) {
+            player.set_direction(1, 0);
+        }
     }
 
     if (is_key_pressed(KeyCode::Up)) {
-        player.set_direction(0, -1);
+        if (player.get_direction() != (0, 1)) {
+            player.set_direction(0, -1);
+        }
     }
 
     if (is_key_pressed(KeyCode::Left)) {
-        player.set_direction(-1, 0);
+        if (player.get_direction() != (1, 0)) {
+            player.set_direction(-1, 0);
+        }
     }
 
     if (is_key_pressed(KeyCode::Down)) {
-        player.set_direction(0, 1);
+        if (player.get_direction() != (0, -1)) {
+            player.set_direction(0, 1);
+        }
     }
+}
 
+fn update(player: &mut Player, apple: &mut Apple) {
     player.move_player();
 
     if (player.position() == apple.position()) {
@@ -65,6 +78,11 @@ fn update(player: &mut Player, apple: &mut Apple, exit: &mut bool) {
     }
 
     if (player.is_out_of_bounds() || player.is_touching_tail()) {
+        let tail_count = player.get_tail_count();
+        if (tail_count > player.get_highscore()) {
+            player.set_highscore(tail_count);
+        }
+
         player.clear_tails();
         player.set_position(64.0, 64.0);
         player.set_direction(1, 0);
